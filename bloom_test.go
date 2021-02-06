@@ -30,7 +30,7 @@ func TestBloomFilter_Add(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	set := &Set {
+	set := &Set{
 		st: make(map[string]bool),
 	}
 
@@ -44,11 +44,10 @@ func TestBloomFilter_Add(t *testing.T) {
 	}
 }
 
-
 func randWord(size uint) string {
 	var buff bytes.Buffer
 	for i := uint(0); i < size; i = i + 1 {
-		buff.WriteRune(rune('a' + rand.Int() % 26))
+		buff.WriteRune(rune('a' + rand.Int()%26))
 	}
 	return buff.String()
 }

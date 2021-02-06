@@ -5,6 +5,7 @@ import (
 	"github.com/spaolacci/murmur3"
 	"github.com/willf/bitset"
 )
+
 // BloomFilter is a probabilistic data structure to test weather a given value is a member of a  given  set
 // (represented by this bloom filter instance).
 //
@@ -22,11 +23,11 @@ import (
 //
 // You can read the original paper for the math behind it.
 type BloomFilter struct {
- 	set *bitset.BitSet
- 	hashes []HashFunc
- 	bits uint32
- 	times uint32
- 	ownHashFn bool
+	set       *bitset.BitSet
+	hashes    []HashFunc
+	bits      uint32
+	times     uint32
+	ownHashFn bool
 }
 
 // NewBloomFilter creates a new BloomFilter with a given size and given a number of hash functions.
@@ -34,7 +35,7 @@ type BloomFilter struct {
 // additional hash functions.
 // The default hash base hash function is the murmur3, any other hash function would've done the job however.
 func NewBloomFilter(size uint, numFunc uint) (*BloomFilter, error) {
-	return bloomWithHashes(size, []HashFunc {
+	return bloomWithHashes(size, []HashFunc{
 		func(i AsBytes) uint64 {
 			murmur := murmur3.New64()
 			murmur.Write(i.Bytes())
@@ -48,15 +49,15 @@ func NewBloomFilterWithHashes(size uint, hashes []HashFunc) (*BloomFilter, error
 	return bloomWithHashes(size, hashes, 1, false)
 }
 
-func bloomWithHashes(size uint, hashes[]HashFunc, numFunc uint, ownHash bool) (*BloomFilter, error) {
+func bloomWithHashes(size uint, hashes []HashFunc, numFunc uint, ownHash bool) (*BloomFilter, error) {
 	if len(hashes) == 0 {
 		return nil, errors.New("you should provide at least one hash function")
 	}
 	return &BloomFilter{
-		set: bitset.New(size),
-		hashes: hashes,
-		bits: uint32(size),
-		times: uint32(numFunc),
+		set:       bitset.New(size),
+		hashes:    hashes,
+		bits:      uint32(size),
+		times:     uint32(numFunc),
 		ownHashFn: ownHash,
 	}, nil
 }
@@ -94,7 +95,7 @@ func (bf *BloomFilter) Has(value AsBytes) bool {
 
 // hasMany will the formula: hash(i) = low(h(0)) + (hi(hash(0)) * i) to generate all of the of the
 // `times` hash functions bit positions.
-func(bf *BloomFilter) hashMany(value AsBytes, hashFn HashFunc) {
+func (bf *BloomFilter) hashMany(value AsBytes, hashFn HashFunc) {
 	h64 := hashFn(value)
 	hlo := uint32(h64)
 	hhi := uint32(h64 >> 32)
@@ -105,7 +106,7 @@ func(bf *BloomFilter) hashMany(value AsBytes, hashFn HashFunc) {
 }
 
 // findMany applies the same formula as hasMany to find the weather the value's hashes are all set.
-func(bf *BloomFilter) findMany(value AsBytes, hashFn HashFunc) bool {
+func (bf *BloomFilter) findMany(value AsBytes, hashFn HashFunc) bool {
 	h64 := hashFn(value)
 	hlo := uint32(h64)
 	hhi := uint32(h64 >> 32)

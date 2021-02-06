@@ -13,17 +13,17 @@ import "math"
 // A count min sketch is biased estimator data structure, it can over estimate (report more elements then the ones added)
 // but it will never under estimate.
 type CountMinSketch struct {
-	width uint32
-	depth uint32
+	width    uint32
+	depth    uint32
 	counters [][]uint64
-	hashes []HashFunc
+	hashes   []HashFunc
 }
 
 // NewCountMinSketch will create a count min sketch based of the width and depth given.
 //
 // The values will determine the size of the underlying table, and the number of hash functions generated, bigger values
 // will give you better estimates, but it will also impact your memory / cpu footprint.
-func NewCountMinSketch (width, depth uint32) *CountMinSketch {
+func NewCountMinSketch(width, depth uint32) *CountMinSketch {
 	arr := make([][]uint64, depth)
 	for i := range arr {
 		arr[i] = make([]uint64, width)
@@ -31,24 +31,24 @@ func NewCountMinSketch (width, depth uint32) *CountMinSketch {
 	hashes := make([]HashFunc, depth)
 
 	for i := uint32(1); i <= depth; i = i + 1 {
-		hashes[i - 1] = MurmurFrom(uint64(i))
+		hashes[i-1] = MurmurFrom(uint64(i))
 	}
 
 	return &CountMinSketch{
-		width: width,
-		depth: depth,
+		width:    width,
+		depth:    depth,
 		counters: arr,
-		hashes: hashes,
+		hashes:   hashes,
 	}
 }
 
 // Increment is equivalent to adding one element of type represented by value.
-func(cm *CountMinSketch) Increment(value AsBytes)  {
+func (cm *CountMinSketch) Increment(value AsBytes) {
 	cm.Add(value, 1)
 }
 
 // Add will increment the buckets corresponding to the value by count.
-func(cm *CountMinSketch) Add(value AsBytes, count uint64)  {
+func (cm *CountMinSketch) Add(value AsBytes, count uint64) {
 	for i := uint32(0); i < cm.depth; i = i + 1 {
 		id := cm.hashes[i](value) % uint64(cm.width)
 		cm.counters[i][id] += count
@@ -58,7 +58,7 @@ func(cm *CountMinSketch) Add(value AsBytes, count uint64)  {
 // Count will return an estimate of the number of values of type value that has been added to the sketch.
 //
 // The count estimate is always greater than or equal the actual count.
-func(cm *CountMinSketch) Count(value AsBytes) uint64 {
+func (cm *CountMinSketch) Count(value AsBytes) uint64 {
 	res := uint64(math.MaxUint64)
 	for i := uint32(0); i < cm.depth; i = i + 1 {
 		id := cm.hashes[i](value) % uint64(cm.width)
@@ -73,5 +73,3 @@ func min(a uint64, res uint64) uint64 {
 	}
 	return a
 }
-
-

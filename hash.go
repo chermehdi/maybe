@@ -8,7 +8,6 @@ type AsBytes interface {
 	Bytes() []byte
 }
 
-
 // HashFunc is any type that can transform an `AsBytes` value into a uint64
 type HashFunc func(AsBytes) uint64
 
@@ -21,6 +20,6 @@ func MurmurFrom(value uint64) HashFunc {
 		h64 := m.Sum64()
 		hi := h64 >> 32
 		lo := uint32(h64)
-		return hi + uint64(lo) * value
+		return hi + uint64(lo)*value
 	}
 }
