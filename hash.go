@@ -23,3 +23,10 @@ func MurmurFrom(value uint64) HashFunc {
 		return hi + uint64(lo)*value
 	}
 }
+
+func MurMurHash(value AsBytes) uint64 {
+	m := murmur3.New64()
+	m.Write(value.Bytes())
+	h64 := m.Sum64()
+	return h64
+}
